@@ -59,5 +59,31 @@ console.log(similarImages(data["1.jpg"], alike, 6)); // recommends 16, 15, 14, 1
 console.log(similarImages(data["11.jpg"], high, 5)); // recommends 16, 13, 18, 15, 2
 console.log(similarImages(data["11.jpg"], alike, 5)); // recommends 15, 16, 14, 18, 13
 
-// The similarImages() function returns the a list of lists: each nested list contains the image key and the total match rating. It's this match rating by which the returned list is ordered: from highest similarity, descending. One could do further filtering with this information (e.g. return only the first few images if the latter's match rating is much lower)
-// Note that element 0 will always be the image we passed in. For efficiency over larger data sets, we'd remove this, but I find it interesting to see the comparison.
+// The similarImages() function returns the a list of lists: each nested list contains the image key and the total match rating. It's this match rating by which the returned list is ordered: from highest similarity, descending. I leave these value in the function's return value so that we can do further tuning (e.g. in the confidence function below).
+// Note that element 0 will always be the image we passed in.
+
+
+// The confidence() function allows you to put a lower bound on the similarity of images. Expressed as a float between 0-1, it is calculated by taking an image in question's match value (as returned by similarImages()) as a percentage of that which similarImages() returns for the target image. 
+
+// The confidence() function calls the similarImages() function, and so needs to be passed chosenImage and matchChoice values, although numberOfImages is hard coded as 10, since imposing confidence is highly likely to return fewer than 10 images. 
+
+
+const confidence = (chosenImage, matchChoice, lowerBound) => {
+  // call similarImages, receive an array containing image names and match values
+  let imageArray = similarImages(chosenImage, matchChoice, 10);
+  // declare array to store images returned 
+  let confident = [];
+  // Start loop at 1 (we're checking the rest of the images against the first)
+  for (let i = 1; i < imageArray.length; i += 1) {
+    // if current image match value, as % of target image, exceeds the lower bound, pass it to array to be returned.
+    if (imageArray[i][1] / imageArray[0][1] > lowerBound) {
+      confident.push(imageArray[i][0]);
+    }
+  }
+  return confident;
+};
+
+// So, the final argument passed into confidence() is the confidence lower bound
+console.log(confidence(data["11.jpg"], high, 0.5)); // [ '16.jpg', '13.jpg', '18.jpg', '15.jpg' ] - interpret as img.11 matches with medium confidence with these images. They're all flowers, but then, so is much of the present data set...
+console.log(confidence(data["2.jpg"], high, 0.7)); // [ '16.jpg' ] interpret as img.2 matches with high confidence with img.16. Cool, they're both purple flowers. 
+console.log(confidence(data["10.jpg"], high, 0.5)); // [ '6.jpg', '5.jpg' ] interpret as img.10 matching these images with medium confidence. I think they're all nightshade family! But to be fair, the next step is to work out if this bares out over a larger dataset, or is a happy accident given how much of the rest of the data set is flowers, and this is just the compliment "not flower" set... Exploration continues!
