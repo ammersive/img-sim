@@ -33,8 +33,8 @@ const similarImages = (chosenImage, matchChoice, numberOfImages) => {
     for (let i = 0; i < imageKeys.length; i += 1) {
       // then within this, loop over the nested data objects within the current image object (we can access these by using the string values from the imageKeys list)
       for (let j = 0; j < Object.values(data[imageKeys[i]]).length; j += 1) {
-        // If the current description being searched matches (inc. is a superset of) the search term description
-        if (data[imageKeys[i]][j]["description"].toLowerCase().includes(description)) {      
+        // If the current description being searched matches (inc. is a superset of) the search term description     
+        if (data[imageKeys[i]][j]["description"].toLowerCase() === description) {      
           // Determine the value of the match (according to the matchChoice - see helper functions above), and add it to the cummilative value for the current image in the matchRatings dictionary          
           matchRatings[imageKeys[i]] += matchChoice(score, data[imageKeys[i]][j]["score"]);
         };  
@@ -53,14 +53,14 @@ const similarImages = (chosenImage, matchChoice, numberOfImages) => {
 // (iii) Number of matching images to return
 // e.g.
 
-console.log(similarImages(data["6.jpg"], high, 5)); // recommends as similar, in desc, order: 5, 10, 14, 4, 18
-console.log(similarImages(data["6.jpg"], alike, 5)); // recommends 10, 5, 14, 15, 11
+console.log(similarImages(data["6.jpg"], high, 3)); // recommends as similar, in desc, order: 5, 10, 4 
+console.log(similarImages(data["6.jpg"], alike, 3)); // recommends 10, 5, 4 
 
-console.log(similarImages(data["1.jpg"], high, 6)); // recommends 16, 18, 2, 11, 7, 15
-console.log(similarImages(data["1.jpg"], alike, 6)); // recommends 16, 15, 14, 11, 2, 18 
+console.log(similarImages(data["1.jpg"], high, 6)); // recommends 2, 16, 15, 18, 11, 7
+console.log(similarImages(data["1.jpg"], alike, 6)); // recommends 15, 16, 2, 9, 7, 11 
 
-console.log(similarImages(data["11.jpg"], high, 5)); // recommends 16, 13, 18, 15, 2
-console.log(similarImages(data["11.jpg"], alike, 5)); // recommends 15, 16, 14, 18, 13
+console.log(similarImages(data["11.jpg"], high, 5)); // recommends 13, 15, 16, 17, 18
+console.log(similarImages(data["11.jpg"], alike, 5)); // recommends 15, 16, 13, 7, 2
 
 // The similarImages() function returns a list of lists: each nested list contains the image key and the total match rating. It's this match rating by which the returned list is ordered: from highest similarity, descending. I leave these values in the function's return value so that we can do further tuning (e.g. in the confidence function below).
 // Note that element 0 will always be the image we passed in.
@@ -89,8 +89,6 @@ const confidence = (chosenImage, matchChoice, lowerBound) => {
 // In the below, we can see that the final argument passed into confidence() is the confidence lower bound.
 // For example:
 
-console.log(confidence(data["11.jpg"], high, 0.5)); // [ '16.jpg', '13.jpg', '18.jpg', '15.jpg' ] - interpret as img 11 matches with medium confidence with these images. They're all flowers, but then, so is much of the present data set...
+console.log(confidence(data["1.jpg"], high, 0.65)); // [ '2.jpg' ] interpret as img 1 matches with reasonable confidence with img.2. Cool, they're both wildflowers. If we lower the confidence bar, the next image we get is 16, another purpler flower 
 
-console.log(confidence(data["2.jpg"], high, 0.7)); // [ '16.jpg' ] interpret as img 2 matches with high confidence with img.16. Cool, they're both purple flowers. 
-
-console.log(confidence(data["10.jpg"], high, 0.5)); // [ '6.jpg', '5.jpg' ] interpret as img 10 matching these images with medium confidence. They're all nightshade family! But to be fair, the next step is to work out if this bares out over a larger dataset, or is a happy accident given how much of the rest of the data set is flowers, and this is just the compliment "not flower" set... Exploration continues!
+console.log(confidence(data["10.jpg"], high, 0.5)); // [ '6.jpg', '5.jpg' ] interpret as img 10 matching these images with medium confidence. These images are all produce, and include the nightshade family, but to be fair, the next step is to work out if this bares out over a larger dataset, or is a happy accident given how much of the rest of the data set is flowers, and this is just the compliment "not flower" set... Exploration continues!
