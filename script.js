@@ -42,7 +42,7 @@ const similarImages = (chosenImage, matchChoice, numberOfImages) => {
     };
   };  
   // Create an array from the matchRatings dictionary, with match values rounded to 3 decimal places
-  let imagesOrdered = Object.keys(matchRatings).map(key => [key, matchRatings[key].toFixed(3)]);
+  let imagesOrdered = Object.keys(matchRatings).map(key => [key, +matchRatings[key].toFixed(3)]);
   // Sort imagesOrdered based on highest to lowest match value
   return imagesOrdered.sort((first, second) => second[1] - first[1]).slice(0, numberOfImages + 1);  
 };
