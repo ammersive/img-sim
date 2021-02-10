@@ -1,4 +1,4 @@
-# Image recognition algorithm
+# Image similarity algorithm
 
 ### Aim: Write an algorithm that, when passed an image, returns images that are similar to the first.
 
